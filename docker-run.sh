@@ -9,7 +9,7 @@ docker run -d -p 80:80 -p 443:443\
     -v /etc/nginx/conf.d  \
     -v /etc/nginx/vhost.d \
     -v /usr/share/nginx/html \
-    -v $(pwd)/../../volumes/proxy/certs:/etc/nginx/certs:ro \
+    -v ~/volumes/proxy/certs:/etc/nginx/certs:ro \
     nginx
 
 # This nginx-gen container using the docker-gen image will generate a 'default.conf' file from the 'nginx.tmpl' located in volumes/proxy/templates.
@@ -17,7 +17,7 @@ echo "Starting docker-gen instance..."
 docker run -d \
     --name nginx-gen \
     --volumes-from nginx \
-    -v $(pwd)/../../volumes/proxy/templates:/etc/docker-gen/templates:ro \
+    -v ~/volumes/proxy/templates:/etc/docker-gen/templates:ro \
     -v /var/run/docker.sock:/tmp/docker.sock:ro \
     jwilder/docker-gen \
     -notify-sighup nginx -watch -only-exposed -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
@@ -27,9 +27,9 @@ echo "Starting letsencrypt-nginx-proxy-companion..."
 docker run -d \
     -e "NGINX_DOCKER_GEN_CONTAINER=nginx-gen" \
     --volumes-from nginx \
-    -v $(pwd)/../../volumes/proxy/certs:/etc/nginx/certs:rw \
+    -v ~/volumes/proxy/certs:/etc/nginx/certs:rw \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
-    alastaircoote/docker-letsencrypt-nginx-proxy-companion
+    jrcs/letsencrypt-nginx-proxy-companion
 
 #   This original repo stopped maintaining and now have bugs, and error is as follows:
 #   Deserialization error: Wrong directory
@@ -41,8 +41,8 @@ docker run -d \
 echo "Starting simple-site nginx example..."
 docker run -d \
     --name simple-site \
-    -e "VIRTUAL_HOST=perf-gitlab.xxx.com" \
-    -e "LETSENCRYPT_HOST=perf-gitlab.xxx.com" \
-    -e "LETSENCRYPT_EMAIL=yugq@xxx.com" \
-    -v $(pwd)/../../volumes/examples/simple-site/conf.d/:/etc/nginx/conf.d \
+    -e "VIRTUAL_HOST=git2.top" \
+    -e "LETSENCRYPT_HOST=git2.top" \
+    -e "LETSENCRYPT_EMAIL=huangzhouwu@gmail.com" \
+    -v ~/volumes/examples/simple-site/conf.d/:/etc/nginx/conf.d \
     nginx
